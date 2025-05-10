@@ -1,21 +1,32 @@
 """Configuration.from_pydantic() tests."""
 
-import pydantic
-from dependency_injector import providers
-from pytest import fixture, mark, raises
-
+from pydantic import BaseModel
 
 try:
-    from pydantic_settings import BaseSettings
+    from pydantic_settings import (
+        BaseSettings,  # type: ignore[import-not-found,unused-ignore]
+    )
 except ImportError:
-    BaseSettings = pydantic.BaseSettings
+    try:
+        from pydantic import BaseSettings  # type: ignore[no-redef,unused-ignore]
+    except ImportError:
+
+        class BaseSettings:  # type: ignore[no-redef]
+            """No-op fallback"""
 
 
-class Section11(pydantic.BaseModel):
+from pytest import fixture, mark, raises
+
+from dependency_injector import providers
+
+pytestmark = mark.pydantic
+
+
+class Section11(BaseModel):
     value1: int = 1
 
 
-class Section12(pydantic.BaseModel):
+class Section12(BaseModel):
     value2: int = 2
 
 
@@ -24,12 +35,12 @@ class Settings1(BaseSettings):
     section2: Section12 = Section12()
 
 
-class Section21(pydantic.BaseModel):
+class Section21(BaseModel):
     value1: int = 11
     value11: int = 11
 
 
-class Section3(pydantic.BaseModel):
+class Section3(BaseModel):
     value3: int = 3
 
 
